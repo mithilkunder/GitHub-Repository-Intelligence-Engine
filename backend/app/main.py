@@ -1,4 +1,4 @@
-from config import APP_NAME, VERSION
+from app.core.config import APP_NAME, VERSION
 from fastapi import FastAPI
 
 app = FastAPI(
