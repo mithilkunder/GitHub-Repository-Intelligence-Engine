@@ -48,11 +48,15 @@ class LanguageDetector:
     SPECIAL_FILENAMES = {
         "Dockerfile": "Docker",
         "Makefile": "Makefile",
-        ".gitignore": "Git Ignore",
-        ".dockerignore": "Docker Ignore",
-        "LICENSE": "License",
         "README": "Markdown",
         "README.md": "Markdown",
+        "LICENSE": "License",
+        ".gitignore": "Git Ignore",
+        ".dockerignore": "Docker Ignore",
+        ".coveragerc": "Coverage Config",
+        ".editorconfig": "Editor Config",
+        ".git-blame-ignore-revs": "Git Config",
+        "CODEOWNERS": "GitHub",
     }
 
     def detect(self, file: Path) -> str:

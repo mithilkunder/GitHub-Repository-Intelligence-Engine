@@ -1,11 +1,15 @@
 from dataclasses import dataclass, field
 from pathlib import Path
 
+from app.models.symbols.class_node import ClassNode
+from app.models.symbols.function_node import FunctionNode
+from app.models.symbols.import_node import ImportNode
+
 
 @dataclass
 class FileNode:
     """
-    Represents a single file inside a repository.
+    Represents one source file inside a repository.
     """
 
     path: Path
@@ -22,11 +26,11 @@ class FileNode:
 
     sha256: str | None = None
 
-    imports: list[str] = field(default_factory=list)
+    imports: list[ImportNode] = field(default_factory=list)
 
-    functions: list[str] = field(default_factory=list)
+    classes: list[ClassNode] = field(default_factory=list)
 
-    classes: list[str] = field(default_factory=list)
+    functions: list[FunctionNode] = field(default_factory=list)
 
     chunks: list[str] = field(default_factory=list)
 

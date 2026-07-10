@@ -10,7 +10,43 @@ print(f"\nRepository: {index.repository_name}")
 print(f"Total Files: {index.total_files}")
 print(f"Main Language: {index.metadata.main_language}")
 
-print("\nFirst 10 Files:\n")
+print("\nFirst 5 Python Files\n")
 
-for file in index.files[:10]:
-    print(f"{file.relative_path:<40}{file.language:<15}{file.size:>8} bytes")
+count = 0
+
+for file in index.files:
+    if file.language != "Python":
+        continue
+
+    print("=" * 80)
+    print(f"File: {file.relative_path}")
+    print(f"Language: {file.language}")
+    print(f"Size: {file.size} bytes")
+
+    print("\nImports")
+    if file.imports:
+        for imp in file.imports:
+            print(f"  {imp}")
+    else:
+        print("  None")
+
+    print("\nClasses")
+    if file.classes:
+        for cls in file.classes:
+            print(f"  {cls}")
+    else:
+        print("  None")
+
+    print("\nFunctions")
+    if file.functions:
+        for func in file.functions:
+            print(f"  {func}")
+    else:
+        print("  None")
+
+    print()
+
+    count += 1
+
+    if count == 5:
+        break

@@ -1,3 +1,4 @@
+import os
 from pathlib import Path
 
 from app.parser.file_filters import FileFilter
@@ -5,35 +6,26 @@ from app.parser.file_filters import FileFilter
 
 class RepositoryScanner:
     """
-    Scans a cloned repository and returns a list of source files.
+    Scans a repository while skipping ignored directories.
     """
 
     def scan(self, repository_path: Path) -> list[Path]:
-        """
-        Recursively scan a repository.
-
-        Parameters
-        ----------
-        repository_path : Path
-            Root directory of the cloned repository.
-
-        Returns
-        -------
-        list[Path]
-            List of valid repository files.
-        """
-
         files: list[Path] = []
 
-        for path in repository_path.rglob("*"):
-            if path.is_dir():
-                if FileFilter.should_ignore_directory(path):
+        for root, dirnames, filenames in os.walk(repository_path):
+            # Prevent os.walk from entering ignored directories
+            dirnames[:] = [
+                d for d in dirnames if not FileFilter.should_ignore_directory(Path(d))
+            ]
+
+            root_path = Path(root)
+
+            for filename in filenames:
+                file = root_path / filename
+
+                if FileFilter.should_ignore_file(file):
                     continue
 
-            if path.is_file():
-                if FileFilter.should_ignore_file(path):
-                    continue
-
-                files.append(path)
+                files.append(file)
 
         return sorted(files)

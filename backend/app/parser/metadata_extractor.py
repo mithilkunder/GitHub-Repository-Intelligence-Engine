@@ -7,7 +7,7 @@ from app.parser.language_detector import LanguageDetector
 
 class MetadataExtractor:
     """
-    Extract repository level metadata.
+    Extract repository-level metadata.
     """
 
     def __init__(self):
@@ -22,16 +22,19 @@ class MetadataExtractor:
 
         for file in files:
             language = self.detector.detect(file)
-            language_counter[language] += 1
+
+            if language != "Unknown":
+                language_counter[language] += 1
 
         names = {file.name for file in files}
-
-        directories = {path.parent.name for path in files}
+        directories = {file.parent.name for file in files}
 
         return RepositoryMetadata(
             name=repository_path.name,
             total_files=len(files),
-            main_language=language_counter.most_common(1)[0][0],
+            main_language=(
+                language_counter.most_common(1)[0][0] if language_counter else "Unknown"
+            ),
             has_readme=self.has_readme(names),
             has_license=self.has_license(names),
             has_git=(repository_path / ".git").exists(),

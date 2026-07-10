@@ -6,6 +6,7 @@ from app.models.repository_index import RepositoryIndex
 from app.parser.language_detector import LanguageDetector
 from app.parser.metadata_extractor import MetadataExtractor
 from app.parser.scanner import RepositoryScanner
+from app.parsers.python_parser import PythonParser
 
 
 class RepositoryIndexer:
@@ -17,6 +18,7 @@ class RepositoryIndexer:
         self.scanner = RepositoryScanner()
         self.detector = LanguageDetector()
         self.extractor = MetadataExtractor()
+        self.python_parser = PythonParser()
 
     def build(self, repository_path: Path) -> RepositoryIndex:
         files = self.scanner.scan(repository_path)
@@ -26,7 +28,7 @@ class RepositoryIndexer:
             files,
         )
 
-        nodes = []
+        nodes: list[FileNode] = []
 
         for file in files:
             node = FileNode(
@@ -37,6 +39,14 @@ class RepositoryIndexer:
                 size=file.stat().st_size,
                 sha256=self.calculate_hash(file),
             )
+
+            # Enrich Python files with AST information
+            if node.language == "Python":
+                analysis = self.python_parser.analyze(file)
+
+                node.imports = analysis.imports
+                node.classes = analysis.classes
+                node.functions = analysis.functions
 
             nodes.append(node)
 
@@ -49,4 +59,7 @@ class RepositoryIndexer:
 
     @staticmethod
     def calculate_hash(file: Path) -> str:
+        """
+        Calculate SHA-256 hash of a file.
+        """
         return hashlib.sha256(file.read_bytes()).hexdigest()
